@@ -5,9 +5,10 @@ game.scene("menu", () => {
     ]);
 
     game.add([
-        game.text("Halloween Candy Collector", 32),
-        game.pos(game.width() / 2, game.height() / 4),
+        game.text("Halloween Candy Collector", { size: 32 }),
+        game.pos(716 / 2, 716 / 4),
         game.anchor("center"),
+        game.color(255, 165, 0), // Orange color
     ]);
 
     game.add([

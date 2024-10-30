@@ -27,4 +27,3 @@ game.loadSound("collect", "/sound/collect.mp3");
 game.loadSound("levelComplete", "/sound/finishgame.mp3");
 
 // Load custom font
-game.loadFont("press-start", "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
