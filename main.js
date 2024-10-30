@@ -1,20 +1,30 @@
-kaboom({
-    global: true,
+// kaboom({
+//     global: true,
+//     width: 716,
+//     height: 716,
+//     scale: 1,
+//     debug: true,
+//   });
+
+const game = kaplay({
     width: 716,
     height: 716,
     scale: 1,
     debug: true,
-  });
+});
 
 // load assets
-loadSprite("player", "/sprite/player.png");
-loadSprite("candy", "/sprite/candy.png");
-loadSprite("ghost", "/sprite/Ghost2.png");
-loadSprite("pumpkin", "/sprite/Pumpkin1.png");
-loadSprite("powerup", "/sprite/boots.png");
-loadSprite("background", "/sprite/background.png");
-loadSprite("startbackground", "/sprite/startbackground.png");
+game.loadSprite("player", "/sprite/player.png");
+game.loadSprite("candy", "/sprite/candy.png");
+game.loadSprite("ghost", "/sprite/Ghost2.png");
+game.loadSprite("pumpkin", "/sprite/Pumpkin1.png");
+game.loadSprite("powerup", "/sprite/boots.png");
+game.loadSprite("background", "/sprite/background.png");
+game.loadSprite("startbackground", "/sprite/startbackground.png");
 
 // sounds
-loadSound("collect", "/sound/collect.mp3");
-loadSound("levelComplete", "/sound/finishgame.mp3");
+game.loadSound("collect", "/sound/collect.mp3");
+game.loadSound("levelComplete", "/sound/finishgame.mp3");
+
+// Load custom font
+game.loadFont("press-start", "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
