@@ -4,7 +4,14 @@ function gameScene(gameState) {
     let timeLeft = 60;
     const TARGET_SCORE = level * 50;
     const PLAYER_SPEED = 100;
-    const BASE_GHOST_SPEED = 2000; // Set to 2000 as requested
+    const BASE_GHOST_SPEED = 2000;
+    const LEFT_MARGIN = 20;
+    const RIGHT_MARGIN = 40;
+    const TOP_MARGIN = 20;
+    const BOTTOM_MARGIN = 40;
+
+    const PLAYER_WIDTH = 32; // Adjust this to match your player sprite width
+    const PLAYER_HEIGHT = 32; // Adjust this to match your player sprite height
 
     // Play ambient sound
     const ambientSound = play("ambient", {
@@ -22,7 +29,7 @@ function gameScene(gameState) {
     const player = add([
         sprite("player"),
         pos(width() / 2, height() / 2),
-        area(),
+        area({ width: PLAYER_WIDTH, height: PLAYER_HEIGHT }),
         {
             speed: PLAYER_SPEED,
             powerUpActive: false
@@ -51,11 +58,11 @@ function gameScene(gameState) {
     function spawnCandy() {
         add([
             sprite("candy"),
-            pos(rand(50, width() - 50), rand(50, height() - 50)),
+            pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
             area(),
             "candy"
         ]);
-        wait(rand(0.5, 1.5) / level, spawnCandy); // Increased spawn rate based on level
+        wait(rand(0.5, 1.5) / level, spawnCandy);
     }
     spawnCandy();
 
@@ -63,7 +70,7 @@ function gameScene(gameState) {
         const ghostSpeed = BASE_GHOST_SPEED + (level * 20);
         const ghost = add([
             sprite("ghost"),
-            pos(rand(50, width() - 50), rand(50, height() - 50)),
+            pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
             area(),
             "ghost",
             {
@@ -88,18 +95,18 @@ function gameScene(gameState) {
     function spawnPumpkin() {
         add([
             sprite("pumpkin"),
-            pos(rand(50, width() - 50), rand(50, height() - 50)),
+            pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
             area(),
             "pumpkin"
         ]);
-        wait(rand(2, 5) / level, spawnPumpkin); // Increased spawn rate based on level
+        wait(rand(2, 5) / level, spawnPumpkin);
     }
     spawnPumpkin();
 
     function spawnPowerUp() {
         add([
             sprite("powerup"),
-            pos(rand(50, width() - 50), rand(50, height() - 50)),
+            pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
             area(),
             "powerup"
         ]);
@@ -107,18 +114,31 @@ function gameScene(gameState) {
     }
     spawnPowerUp();
 
-    onKeyDown("left", () => {
-        player.move(-player.speed, 0);
+    onKeyPress("left", () => {
+        console.log("Left key pressed");
     });
-    onKeyDown("right", () => {
-        player.move(player.speed, 0);
+    onKeyPress("right", () => {
+        console.log("Right key pressed");
     });
-    onKeyDown("up", () => {
-        player.move(0, -player.speed);
+    onKeyPress("up", () => {
+        console.log("Up key pressed");
     });
-    onKeyDown("down", () => {
-        player.move(0, player.speed);
+    onKeyPress("down", () => {
+        console.log("Down key pressed");
     });
+    onKeyPress("a", () => {
+        console.log("A key pressed");
+    });
+    onKeyPress("d", () => {
+        console.log("D key pressed");
+    });
+    onKeyPress("w", () => {
+        console.log("W key pressed");
+    });
+    onKeyPress("s", () => {
+        console.log("S key pressed");
+    });
+    
 
     onCollide("player", "candy", (p, c) => {
         destroy(c);
@@ -169,6 +189,21 @@ function gameScene(gameState) {
         if (timeLeft <= 0 || sanity <= 0) {
             ambientSound.stop();
             go("gameOver", { score, level });
+        }
+
+        const moveSpeed = player.speed * dt();
+    
+        if (isKeyDown("left") || isKeyDown("a")) {
+            player.pos.x = Math.max(player.pos.x - moveSpeed, LEFT_MARGIN);
+        }
+        if (isKeyDown("right") || isKeyDown("d")) {
+            player.pos.x = Math.min(player.pos.x + moveSpeed, width() - RIGHT_MARGIN - PLAYER_WIDTH);
+        }
+        if (isKeyDown("up") || isKeyDown("w")) {
+            player.pos.y = Math.max(player.pos.y - moveSpeed, TOP_MARGIN);
+        }
+        if (isKeyDown("down") || isKeyDown("s")) {
+            player.pos.y = Math.min(player.pos.y + moveSpeed, height() - BOTTOM_MARGIN - PLAYER_HEIGHT);
         }
     });
 }
