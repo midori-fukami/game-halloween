@@ -67,3 +67,12 @@ function spawnPowerUp() {
     ]);
     wait(rand(15, 20), spawnPowerUp);
 }
+
+function spawnCrucifix() {
+    add([
+        sprite("crucifix"), // Make sure to add a crucifix sprite to your assets
+        pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
+        area(),
+        "crucifix"
+    ]);
+}

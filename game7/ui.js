@@ -32,7 +32,7 @@ function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel) {
     return { scoreText, timerText, sanityMeter, batteryUI, powerUpUI };
 }
 
-function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps) {
+function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, crucifixTimer) {
     ui.scoreText.text = `Score: ${score}/${TARGET_SCORE}`;
     ui.timerText.text = `Time: ${Math.ceil(timeLeft)}`;
     ui.sanityMeter.width = (sanity / 100) * 200;
@@ -45,4 +45,8 @@ function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activ
         }
     }
     ui.powerUpUI.text = activePowerUpsText;
+
+    if (hasCrucifix) {
+        ui.powerUpUI.text += `Crucifix: ${Math.ceil(crucifixTimer)}s `;
+    }
 }

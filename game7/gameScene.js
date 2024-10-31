@@ -11,6 +11,8 @@ function gameScene(gameState) {
         repellent: false,
         magnet: false
     };
+    let hasCrucifix = false;
+    let crucifixTimer = 0;
 
     const ambientSound = play("ambient", { loop: true, volume: 0.5 });
 
@@ -22,6 +24,19 @@ function gameScene(gameState) {
 
     spawnGhost(level, player);
     spawnPowerUp();
+
+    function activateCrucifix() {
+        hasCrucifix = true;
+        crucifixTimer = CRUCIFIX_DURATION;
+        // You might want to add a visual indicator that the crucifix is active
+        player.use(color(255, 255, 0)); // Example: turn the player yellow
+    }
+
+    onCollide("player", "crucifix", (p, c) => {
+        destroy(c);
+        activateCrucifix();
+        play("powerup");
+    });
 
     function activatePowerUp(type) {
         activePowerUps[type] = true;
@@ -77,7 +92,11 @@ function gameScene(gameState) {
     });
 
     onCollide("player", "ghost", (p, g) => {
-        if (!activePowerUps.invincibility && !g.stunned) {
+        if (hasCrucifix) {
+            destroy(g);
+            score += EXORCISM_POINTS;
+            play("exorcism"); // Add an exorcism sound effect
+        } else if (!activePowerUps.invincibility && !g.stunned) {
             sanity -= 10;
             play("jumpscare");
             shake(5);
@@ -149,6 +168,20 @@ function gameScene(gameState) {
         if (timeLeft <= 0 || sanity <= 0) {
             ambientSound.stop();
             go("gameOver", { score, level });
+        }
+
+        // Spawn crucifix
+        if (rand() < CRUCIFIX_SPAWN_CHANCE) {
+            spawnCrucifix();
+        }
+
+        // Update crucifix timer
+        if (hasCrucifix) {
+            crucifixTimer -= dt();
+            if (crucifixTimer <= 0) {
+                hasCrucifix = false;
+                player.use(color(255, 255, 255)); // Reset player color
+            }
         }
     });
 }
