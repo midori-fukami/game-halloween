@@ -1,4 +1,4 @@
-// entities.js
+const POWERUP_TYPES = ["speed", "invincibility", "repellent", "magnet"];
 
 function spawnCandy(level) {
     add([
@@ -57,11 +57,13 @@ function spawnGhost(level, player) {
 }
 
 function spawnPowerUp() {
+    const type = choose(POWERUP_TYPES);
     add([
         sprite("powerup"),
         pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
         area(),
-        "powerup"
+        "powerup",
+        { type: type }
     ]);
     wait(rand(15, 20), spawnPowerUp);
 }

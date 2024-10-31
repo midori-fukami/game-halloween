@@ -5,6 +5,12 @@ function gameScene(gameState) {
     const TARGET_SCORE = level * 50;
     let flashlightOn = false;
     let batteryLevel = FLASHLIGHT_BATTERY;
+    let activePowerUps = {
+        speed: false,
+        invincibility: false,
+        repellent: false,
+        magnet: false
+    };
 
     const ambientSound = play("ambient", { loop: true, volume: 0.5 });
 
@@ -14,10 +20,23 @@ function gameScene(gameState) {
     const flashlight = createFlashlight();
     const ui = createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel);
 
-    spawnCandy(level);
     spawnGhost(level, player);
-    spawnPumpkin(level);
     spawnPowerUp();
+
+    function activatePowerUp(type) {
+        activePowerUps[type] = true;
+        
+        if (type === "speed") {
+            player.speed = PLAYER_SPEED * 1.5;
+        }
+        
+        wait(POWERUP_DURATION, () => {
+            activePowerUps[type] = false;
+            if (type === "speed") {
+                player.speed = PLAYER_SPEED;
+            }
+        });
+    }
 
     function stunGhost(ghost) {
         if (!ghost.stunned) {
@@ -29,7 +48,7 @@ function gameScene(gameState) {
 
     onKeyPress("space", () => {
         flashlightOn = !flashlightOn;
-        flashlight.opacity = flashlightOn ? 0.3 : 0;
+        flashlight.opacity = flashlightOn ? FLASHLIGHT_BASE_OPACITY : 0;
         play("flashlightClick");
 
         if (flashlightOn) {
@@ -58,7 +77,7 @@ function gameScene(gameState) {
     });
 
     onCollide("player", "ghost", (p, g) => {
-        if (!player.powerUpActive && !g.stunned) {
+        if (!activePowerUps.invincibility && !g.stunned) {
             sanity -= 10;
             play("jumpscare");
             shake(5);
@@ -73,20 +92,9 @@ function gameScene(gameState) {
 
     onCollide("player", "powerup", (p, powerup) => {
         destroy(powerup);
-        player.powerUpActive = true;
-        player.speed = PLAYER_SPEED * 1.5;
-        player.use(color(0, 255, 0));
-        play("collect");
-        
-        wait(5, () => {
-            player.powerUpActive = false;
-            player.speed = PLAYER_SPEED;
-            player.use(color(255, 255, 255));
-        });
+        activatePowerUp(powerup.type);
+        play("powerup");
     });
-
-    spawnGhost(level, player);
-    spawnPowerUp();
 
     onUpdate(() => {
         movePlayer(player);
@@ -99,12 +107,32 @@ function gameScene(gameState) {
             clearWeather();
         }
 
-        // Update ghost visibilities based on weather
+        // Update ghosts based on weather and power-ups
         get("ghost").forEach(ghost => {
             if (!ghost.stunned) {
                 ghost.opacity = GHOST_BASE_OPACITY * getVisibilityFactor();
+                
+                if (activePowerUps.repellent) {
+                    const repelDir = ghost.pos.sub(player.pos).unit();
+                    ghost.move(repelDir.scale(ghost.baseSpeed * dt()));
+                } else {
+                    const dir = player.pos.sub(ghost.pos).unit();
+                    ghost.move(dir.scale(ghost.baseSpeed * dt()));
+                }
             }
         });
+
+        // Magnet power-up effect
+        if (activePowerUps.magnet) {
+            get("candy").forEach(candy => {
+                const dir = player.pos.sub(candy.pos).unit();
+                candy.move(dir.scale(200 * dt()));
+            });
+            get("pumpkin").forEach(pumpkin => {
+                const dir = player.pos.sub(pumpkin.pos).unit();
+                pumpkin.move(dir.scale(200 * dt()));
+            });
+        }
 
         // Adjust candy and pumpkin spawn rates based on weather difficulty
         const difficultyFactor = getDifficultyFactor();
@@ -116,7 +144,7 @@ function gameScene(gameState) {
         }
 
         timeLeft -= dt();
-        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel);
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps);
 
         if (timeLeft <= 0 || sanity <= 0) {
             ambientSound.stop();

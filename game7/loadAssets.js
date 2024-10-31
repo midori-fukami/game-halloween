@@ -9,6 +9,7 @@ function loadAssets() {
     loadSprite("flashlight", "/sprite/flashbeam.png");
 
     loadSound("collect", "/sound/collect.mp3");
+    loadSound("powerup", "/sound/collect.mp3");
     loadSound("levelComplete", "/sound/finishgame.mp3");
     loadSound("ambient", "/sound/atmosphere.mp3");
     loadSound("jumpscare", "/sound/jumpscare.mp3");
