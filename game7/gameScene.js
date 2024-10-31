@@ -91,6 +91,18 @@ function gameScene(gameState) {
         flashlightOn = flashlightStatus.flashlightOn;
         batteryLevel = flashlightStatus.batteryLevel;
 
+        updateWeather();
+        if (currentWeather === "clear") {
+            clearWeather();
+        }
+
+        // Update ghost visibilities based on weather
+        get("ghost").forEach(ghost => {
+            if (!ghost.stunned) {
+                ghost.opacity = GHOST_BASE_OPACITY * getVisibilityFactor();
+            }
+        });
+
         timeLeft -= dt();
         updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel);
 

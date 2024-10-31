@@ -26,14 +26,18 @@ function updateFlashlight(flashlight, player, flashlightOn, batteryLevel) {
     );
 
     if (flashlightOn) {
-        batteryLevel = Math.max(0, batteryLevel - 0.4);
+        batteryLevel = Math.max(0, batteryLevel - 0.1);
         if (batteryLevel <= 0) {
             flashlightOn = false;
             flashlight.opacity = 0;
+        } else {
+            flashlight.opacity = FLASHLIGHT_BASE_OPACITY * getVisibilityFactor();
         }
     } else {
-        batteryLevel = Math.min(FLASHLIGHT_BATTERY, batteryLevel + 0.01);
+        batteryLevel = Math.min(FLASHLIGHT_BATTERY, batteryLevel + 0.05);
+        flashlight.opacity = 0;
     }
 
     return { flashlightOn, batteryLevel };
 }
+
