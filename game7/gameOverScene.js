@@ -7,13 +7,13 @@ function gameOverScene(gameState) {
     ]);
 
     add([
-        text(`Game Over!\nScore: ${score}\nLevel: ${level}\nPress space to restart`, 24),
+        text(`Game Over!\nScore: ${score}\nLevel: ${level}\nPress escape to restart`, 24),
         pos(width() / 2, height() / 2),
         anchor("center"),
         color(255, 0, 0),
     ]);
 
-    onKeyPress("space", () => {
+    onKeyPress("escape", () => {
         go("menu");
     });
 }

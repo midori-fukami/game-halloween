@@ -1,6 +1,6 @@
 const PLAYER_SPEED = 100;
 const BASE_GHOST_SPEED = 3000;
-const MAX_GHOSTS = 5;
+const MAX_GHOSTS = 20;
 const LEFT_MARGIN = 20;
 const RIGHT_MARGIN = 40;
 const TOP_MARGIN = 20;

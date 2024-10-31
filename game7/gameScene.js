@@ -85,6 +85,9 @@ function gameScene(gameState) {
         });
     });
 
+    spawnGhost(level, player);
+    spawnPowerUp();
+
     onUpdate(() => {
         movePlayer(player);
         const flashlightStatus = updateFlashlight(flashlight, player, flashlightOn, batteryLevel);
@@ -102,6 +105,15 @@ function gameScene(gameState) {
                 ghost.opacity = GHOST_BASE_OPACITY * getVisibilityFactor();
             }
         });
+
+        // Adjust candy and pumpkin spawn rates based on weather difficulty
+        const difficultyFactor = getDifficultyFactor();
+        if (rand(0, 100) < 2 * difficultyFactor) {
+            spawnCandy(level);
+        }
+        if (rand(0, 200) < 1 * difficultyFactor) {
+            spawnPumpkin(level);
+        }
 
         timeLeft -= dt();
         updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel);
