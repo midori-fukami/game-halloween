@@ -63,7 +63,7 @@ function updateWeather() {
 
 function updateRainParticles() {
     rainParticles.forEach(drop => {
-        drop.move(0, 300 * dt());
+        drop.move(0, 6000 * dt());
         if (drop.pos.y > height()) {
             drop.pos.y = -10;
             drop.pos.x = rand(0, width());

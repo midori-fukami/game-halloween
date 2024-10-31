@@ -145,11 +145,11 @@ function gameScene(gameState) {
         if (activePowerUps.magnet) {
             get("candy").forEach(candy => {
                 const dir = player.pos.sub(candy.pos).unit();
-                candy.move(dir.scale(200 * dt()));
+                candy.move(dir.scale(2000 * dt()));
             });
             get("pumpkin").forEach(pumpkin => {
                 const dir = player.pos.sub(pumpkin.pos).unit();
-                pumpkin.move(dir.scale(200 * dt()));
+                pumpkin.move(dir.scale(2000 * dt()));
             });
         }
 

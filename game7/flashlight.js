@@ -21,8 +21,8 @@ function createFlashlight() {
 
 function updateFlashlight(flashlight, player, flashlightOn, batteryLevel) {
     flashlight.pos = vec2(
-        player.pos.x + PLAYER_WIDTH + PLAYER_WIDTH/2,
-        player.pos.y + PLAYER_HEIGHT + PLAYER_HEIGHT/2
+        player.pos.x + PLAYER_WIDTH / 2,
+        player.pos.y + PLAYER_HEIGHT / 2
     );
 
     if (flashlightOn) {
