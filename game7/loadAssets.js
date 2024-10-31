@@ -12,5 +12,5 @@ function loadAssets() {
     loadSound("levelComplete", "/sound/finishgame.mp3");
     loadSound("ambient", "/sound/atmosphere.mp3");
     loadSound("jumpscare", "/sound/jumpscare.mp3");
-    loadSound("flashlightClick", "/sound/jumpscare.mp3");
+    loadSound("flashlightClick", "/sound/flashlightClick.mp3");
 }

@@ -5,13 +5,13 @@ function gameScene(gameState) {
     const TARGET_SCORE = level * 50;
     const PLAYER_SPEED = 100;
     const BASE_GHOST_SPEED = 2000;
+    
     const LEFT_MARGIN = 20;
     const RIGHT_MARGIN = 40;
     const TOP_MARGIN = 20;
     const BOTTOM_MARGIN = 40;
-
-    const PLAYER_WIDTH = 32; // Adjust this to match your player sprite width
-    const PLAYER_HEIGHT = 32; // Adjust this to match your player sprite height
+    const PLAYER_WIDTH = 32; // Adjust based on your player sprite
+    const PLAYER_HEIGHT = 32; // Adjust based on your player sprite
 
     // Play ambient sound
     const ambientSound = play("ambient", {
@@ -22,8 +22,6 @@ function gameScene(gameState) {
     add([
         sprite("background"),
         scale(0.7),
-        anchor("center"),
-        pos(width() / 2, height() / 2)
     ]);
 
     const player = add([
@@ -55,6 +53,40 @@ function gameScene(gameState) {
         color(0, 255, 0),
     ]);
 
+    const FLASHLIGHT_RADIUS = 100;
+    const FLASHLIGHT_SEGMENTS = 16; // Number of segments to approximate the circle
+
+    // Create polygon points for a circle
+    const flashlightPoints = [];
+    for (let i = 0; i < FLASHLIGHT_SEGMENTS; i++) {
+        const angle = (i / FLASHLIGHT_SEGMENTS) * Math.PI * 2;
+        flashlightPoints.push(vec2(
+            Math.cos(angle) * FLASHLIGHT_RADIUS,
+            Math.sin(angle) * FLASHLIGHT_RADIUS
+        ));
+    }
+
+    const flashlight = add([
+        polygon(flashlightPoints),
+        color(255, 255, 0, 0.3),  // Yellow with 30% opacity
+        pos(0, 0),
+        anchor("center"),
+        area(),
+        opacity(0),  // Start with flashlight off
+        "flashlight"
+    ]);
+
+    let flashlightOn = false;
+    const FLASHLIGHT_BATTERY = 100;
+    let batteryLevel = FLASHLIGHT_BATTERY;
+
+    // Battery UI
+    const batteryUI = add([
+        text(`Battery: ${batteryLevel}%`),
+        pos(20, 110),
+        color(255, 255, 255),
+    ]);
+
     function spawnCandy() {
         add([
             sprite("candy"),
@@ -70,23 +102,38 @@ function gameScene(gameState) {
         const ghostSpeed = BASE_GHOST_SPEED + (level * 20);
         const ghost = add([
             sprite("ghost"),
-            pos(rand(MARGIN, width() - MARGIN), rand(MARGIN, height() - MARGIN)),
+            pos(rand(LEFT_MARGIN, width() - RIGHT_MARGIN), rand(TOP_MARGIN, height() - BOTTOM_MARGIN)),
             area(),
-            opacity(0.5),  // Make ghosts semi-transparent
+            opacity(0.5),
             "ghost",
             {
                 speed: rand(ghostSpeed * 0.8, ghostSpeed * 1.2),
-                stunned: false
+                stunned: false,
+                stunTime: 0
             },
         ]);
-
+    
+        ghost.onCollide("flashlight", () => {
+            if (flashlightOn && !ghost.stunned) {
+                stunGhost(ghost);
+            }
+        });
+    
         ghost.onUpdate(() => {
+            if (ghost.stunTime > 0) {
+                ghost.stunTime -= dt();
+                if (ghost.stunTime <= 0) {
+                    ghost.stunned = false;
+                    ghost.opacity = 0.5;
+                }
+            }
+    
             if (!ghost.stunned) {
                 const dir = player.pos.sub(ghost.pos).unit();
                 ghost.move(dir.scale(ghost.speed * dt()));
             }
         });
-
+    
         wait(rand(2, 4) / level, spawnGhost);
     }
     spawnGhost();
@@ -113,36 +160,67 @@ function gameScene(gameState) {
     }
     spawnPowerUp();
 
-    onKeyPress("left", () => {
-        console.log("Left key pressed");
+    // Player movement and flashlight update
+    onUpdate(() => {
+        const moveSpeed = player.speed * dt();
+        
+        if (isKeyDown("left") || isKeyDown("a")) {
+            player.pos.x = Math.max(player.pos.x - moveSpeed, LEFT_MARGIN);
+        }
+        if (isKeyDown("right") || isKeyDown("d")) {
+            player.pos.x = Math.min(player.pos.x + moveSpeed, width() - RIGHT_MARGIN - PLAYER_WIDTH);
+        }
+        if (isKeyDown("up") || isKeyDown("w")) {
+            player.pos.y = Math.max(player.pos.y - moveSpeed, TOP_MARGIN);
+        }
+        if (isKeyDown("down") || isKeyDown("s")) {
+            player.pos.y = Math.min(player.pos.y + moveSpeed, height() - BOTTOM_MARGIN - PLAYER_HEIGHT);
+        }
+
+        // Flashlight update
+        flashlight.pos = vec2(
+            player.pos.x + PLAYER_WIDTH + PLAYER_WIDTH/2,
+            player.pos.y + PLAYER_HEIGHT + PLAYER_HEIGHT/2
+        );
+
+        if (flashlightOn) {
+            // Drain battery
+            batteryLevel = Math.max(0, batteryLevel - 0.1);
+            if (batteryLevel <= 0) {
+                flashlightOn = false;
+                flashlight.opacity = 0;
+            }
+        } else {
+            // Recharge battery when off
+            batteryLevel = Math.min(FLASHLIGHT_BATTERY, batteryLevel + 0.05);
+        }
+
+        batteryUI.text = `Battery: ${Math.floor(batteryLevel)}%`;
     });
-    onKeyPress("right", () => {
-        console.log("Right key pressed");
-    });
-    onKeyPress("up", () => {
-        console.log("Up key pressed");
-    });
-    onKeyPress("down", () => {
-        console.log("Down key pressed");
-    });
-    onKeyPress("a", () => {
-        console.log("A key pressed");
-    });
-    onKeyPress("d", () => {
-        console.log("D key pressed");
-    });
-    onKeyPress("w", () => {
-        console.log("W key pressed");
-    });
-    onKeyPress("s", () => {
-        console.log("S key pressed");
-    });
+
+
     // Flashlight toggle
-    onKeyPress("space", () => {
+    onKeyPress("f", () => {
         flashlightOn = !flashlightOn;
-        flashlight.opacity = flashlightOn ? 1 : 0;
+        flashlight.opacity = flashlightOn ? 0.3 : 0;
         play("flashlightClick");  // Assuming you have this sound
+
+        // Check for ghosts in the flashlight area when turned on
+        if (flashlightOn) {
+            every("ghost", (ghost) => {
+                if (ghost.isColliding(flashlight) && !ghost.stunned) {
+                    stunGhost(ghost);
+                }
+            });
+        }
     });
+
+    function stunGhost(ghost) {
+        ghost.stunned = true;
+        ghost.stunTime = 2;
+        ghost.opacity = 1;
+        play("ghostStun");
+    }
 
     onCollide("player", "candy", (p, c) => {
         destroy(c);
@@ -151,25 +229,13 @@ function gameScene(gameState) {
         play("collect");
         if (score >= TARGET_SCORE) {
             play("levelComplete");
-            go("game", { level: level + 1, sanity: 100 }); // Reset sanity to 100 when passing a level
+            go("game", { level: level + 1, sanity: 100 });
         }
     });
 
-     // Flashlight effect on ghosts
-     onCollide("flashlight", "ghost", (f, g) => {
-        if (flashlightOn) {
-            g.use(color(255, 255, 255));  // Make ghost visible
-            g.stunned = true;
-            wait(2, () => {
-                g.use(color(255, 255, 255, 0.5));  // Return to semi-transparent
-                g.stunned = false;
-            });
-        }
-    });
-
-
+    // Update the player-ghost collision handler
     onCollide("player", "ghost", (p, g) => {
-        if (!player.powerUpActive) {
+        if (!player.powerUpActive && !g.stunned) {
             sanity -= 10;
             play("jumpscare");
             shake(5);
@@ -186,7 +252,7 @@ function gameScene(gameState) {
     onCollide("player", "powerup", (p, powerup) => {
         destroy(powerup);
         player.powerUpActive = true;
-        player.speed = PLAYER_SPEED * 1.5; // Increase player speed by 50%
+        player.speed = PLAYER_SPEED * 1.5;
         player.use(color(0, 255, 0));
         play("collect");
         
@@ -197,29 +263,16 @@ function gameScene(gameState) {
         });
     });
 
-    // Flashlight setup
-    const flashlight = add([
-        rect(100, 100),  // Adjust size as needed
-        color(255, 255, 0, 0.5),  // Yellow with 50% opacity
-        pos(player.pos),
-        rotate(0),
-        opacity(0),  // Start with flashlight off
-        "flashlight"
-    ]);
-
-    let flashlightOn = false;
-    const FLASHLIGHT_BATTERY = 100;
-    let batteryLevel = FLASHLIGHT_BATTERY;
-
-    // Battery UI
-    const batteryUI = add([
-        text(`Battery: ${batteryLevel}%`),
-        pos(20, 110),
-        color(255, 255, 255),
-    ]);
-
-    
-
+    // Flashlight effect on ghosts
+    onCollide("ghost", "flashlight", (g, f) => {
+        console.log("ghost touch flashlight")
+        if (flashlightOn && !g.stunned) {
+            g.stunned = true;
+            g.stunTime = 2;  // Stun for 2 seconds
+            g.opacity = 1;  // Make ghost fully visible when stunned
+            //play("ghostStun");  // Assuming you have this sound
+        }
+    });
 
     onUpdate(() => {
         timeLeft -= dt();
@@ -231,37 +284,5 @@ function gameScene(gameState) {
             ambientSound.stop();
             go("gameOver", { score, level });
         }
-
-        const moveSpeed = player.speed * dt();
-    
-        if (isKeyDown("left") || isKeyDown("a")) {
-            player.pos.x = Math.max(player.pos.x - moveSpeed, LEFT_MARGIN);
-        }
-        if (isKeyDown("right") || isKeyDown("d")) {
-            player.pos.x = Math.min(player.pos.x + moveSpeed, width() - RIGHT_MARGIN - PLAYER_WIDTH);
-        }
-        if (isKeyDown("up") || isKeyDown("w")) {
-            player.pos.y = Math.max(player.pos.y - moveSpeed, TOP_MARGIN);
-        }
-        if (isKeyDown("down") || isKeyDown("s")) {
-            player.pos.y = Math.min(player.pos.y + moveSpeed, height() - BOTTOM_MARGIN - PLAYER_HEIGHT);
-        }
-
-        if (flashlightOn) {
-            flashlight.pos = player.pos;
-            flashlight.angle = player.angle || 0;  // Assuming player has an angle property
-
-            // Drain battery
-            batteryLevel = Math.max(0, batteryLevel - 0.1);
-            if (batteryLevel <= 0) {
-                flashlightOn = false;
-                flashlight.opacity = 0;
-            }
-        } else {
-            // Recharge battery when off
-            batteryLevel = Math.min(FLASHLIGHT_BATTERY, batteryLevel + 0.05);
-        }
-
-        batteryUI.text = `Battery: ${Math.floor(batteryLevel)}%`;
     });
 }
