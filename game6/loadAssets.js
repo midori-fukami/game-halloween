@@ -3,7 +3,7 @@ function loadAssets() {
     loadSprite("candy", "/sprite/candy.png");
     loadSprite("ghost", "/sprite/Ghost2.png");
     loadSprite("pumpkin", "/sprite/Pumpkin1.png");
-    loadSprite("powerup", "/sprite/Pumpkin1.png");
+    loadSprite("powerup", "/sprite/boots.png");
     loadSprite("background", "/sprite/background.png");
     loadSprite("startBackground", "/sprite/startbackground.png");
     loadSprite("flashlight", "/sprite/flashbeam.png");

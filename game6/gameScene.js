@@ -4,6 +4,7 @@ function gameScene(gameState) {
     let timeLeft = 60;
     const TARGET_SCORE = level * 50;
     const PLAYER_SPEED = 100;
+    const BASE_GHOST_SPEED = 2000; // Set to 2000 as requested
 
     // Play ambient sound
     const ambientSound = play("ambient", {
@@ -14,6 +15,8 @@ function gameScene(gameState) {
     add([
         sprite("background"),
         scale(0.7),
+        anchor("center"),
+        pos(width() / 2, height() / 2)
     ]);
 
     const player = add([
@@ -52,34 +55,33 @@ function gameScene(gameState) {
             area(),
             "candy"
         ]);
-        wait(rand(1, 3), spawnCandy);
+        wait(rand(0.5, 1.5) / level, spawnCandy); // Increased spawn rate based on level
     }
     spawnCandy();
 
     function spawnGhost() {
+        const ghostSpeed = BASE_GHOST_SPEED + (level * 20);
         const ghost = add([
             sprite("ghost"),
             pos(rand(50, width() - 50), rand(50, height() - 50)),
             area(),
             "ghost",
             {
-                speed: rand(50, 100),
+                speed: rand(ghostSpeed * 0.8, ghostSpeed * 1.2),
                 direction: vec2(rand(-1, 1), rand(-1, 1)).unit()
             },
         ]);
 
         ghost.onUpdate(() => {
-            // Move towards player
             const dir = player.pos.sub(ghost.pos).unit();
             ghost.move(dir.scale(ghost.speed * dt()));
 
-            // Occasionally change direction for unpredictability
-            if (chance(0.02)) {
+            if (chance(0.01)) {
                 ghost.direction = vec2(rand(-1, 1), rand(-1, 1)).unit();
             }
         });
 
-        wait(rand(3, 6) / level, spawnGhost);
+        wait(rand(2, 4) / level, spawnGhost);
     }
     spawnGhost();
 
@@ -90,7 +92,7 @@ function gameScene(gameState) {
             area(),
             "pumpkin"
         ]);
-        wait(rand(5, 10), spawnPumpkin);
+        wait(rand(2, 5) / level, spawnPumpkin); // Increased spawn rate based on level
     }
     spawnPumpkin();
 
@@ -125,7 +127,7 @@ function gameScene(gameState) {
         play("collect");
         if (score >= TARGET_SCORE) {
             play("levelComplete");
-            go("game", { level: level + 1, sanity: sanity });
+            go("game", { level: level + 1, sanity: 100 }); // Reset sanity to 100 when passing a level
         }
     });
 
@@ -147,9 +149,10 @@ function gameScene(gameState) {
     onCollide("player", "powerup", (p, powerup) => {
         destroy(powerup);
         player.powerUpActive = true;
-        player.speed = PLAYER_SPEED * 1.5;
+        player.speed = PLAYER_SPEED * 1.5; // Increase player speed by 50%
         player.use(color(0, 255, 0));
         play("collect");
+        
         wait(5, () => {
             player.powerUpActive = false;
             player.speed = PLAYER_SPEED;
