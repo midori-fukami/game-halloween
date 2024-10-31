@@ -19,10 +19,32 @@ function gameScene(gameState) {
     spawnPumpkin(level);
     spawnPowerUp();
 
+    function stunGhost(ghost) {
+        if (!ghost.stunned) {
+            ghost.stunned = true;
+            ghost.stunTime = 2;
+            ghost.opacity = 1;
+        }
+    }
+
     onKeyPress("space", () => {
         flashlightOn = !flashlightOn;
         flashlight.opacity = flashlightOn ? 0.3 : 0;
         play("flashlightClick");
+
+        if (flashlightOn) {
+            get("ghost").forEach(ghost => {
+                if (ghost.isColliding(flashlight)) {
+                    stunGhost(ghost);
+                }
+            });
+        }
+    });
+
+    onCollide("ghost", "flashlight", (ghost, f) => {
+        if (flashlightOn) {
+            stunGhost(ghost);
+        }
     });
 
     onCollide("player", "candy", (p, c) => {

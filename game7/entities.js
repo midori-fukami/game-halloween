@@ -24,14 +24,6 @@ function spawnGhost(level, player) {
             },
         ]);
 
-        ghost.onCollide("flashlight", (f) => {
-            if (f.opacity > 0 && !ghost.stunned) {
-                ghost.stunned = true;
-                ghost.stunTime = 2;
-                ghost.opacity = 1;
-            }
-        });
-
         ghost.onUpdate(() => {
             if (ghost.stunTime > 0) {
                 ghost.stunTime -= dt();
