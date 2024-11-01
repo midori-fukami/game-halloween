@@ -21,3 +21,15 @@ const UPGRADE_COSTS = {
 let PLAYER_SPEED = 100;
 let POWERUP_DURATION = 5;
 let FLASHLIGHT_RADIUS = 50;
+// Export functions to modify these values
+function increasePlayerSpeed(amount) {
+    PLAYER_SPEED += amount;
+}
+
+function increasePowerupDuration(amount) {
+    POWERUP_DURATION += amount;
+}
+
+function increaseFlashlightRadius(amount) {
+    FLASHLIGHT_RADIUS += amount;
+}

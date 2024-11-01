@@ -1,16 +1,16 @@
-let currentFlashlight = null;
+let currentFlashlightRadius = FLASHLIGHT_RADIUS;
 
 function createFlashlight() {
     const flashlightPoints = [];
     for (let i = 0; i < 16; i++) {
         const angle = (i / 16) * Math.PI * 2;
         flashlightPoints.push(vec2(
-            Math.cos(angle) * FLASHLIGHT_RADIUS,
-            Math.sin(angle) * FLASHLIGHT_RADIUS
+            Math.cos(angle) * currentFlashlightRadius,
+            Math.sin(angle) * currentFlashlightRadius
         ));
     }
 
-    currentFlashlight = add([
+    return add([
         polygon(flashlightPoints),
         pos(0, 0),
         color(255, 255, 0, 0.3),
@@ -19,30 +19,9 @@ function createFlashlight() {
         opacity(0),
         "flashlight",
         {
-            radius: FLASHLIGHT_RADIUS
+            radius: currentFlashlightRadius
         }
     ]);
-
-    return currentFlashlight;
-}
-
-function getFlashlight() {
-    return currentFlashlight;
-}
-
-function increaseFlashlightSize(amount) {
-    if (currentFlashlight) {
-        currentFlashlight.radius += amount + 100;
-        const newPoints = [];
-        for (let i = 0; i < 16; i++) {
-            const angle = (i / 16) * Math.PI * 2;
-            newPoints.push(vec2(
-                Math.cos(angle) * currentFlashlight.radius,
-                Math.sin(angle) * currentFlashlight.radius
-            ));
-        }
-        currentFlashlight.use(polygon(newPoints));
-    }
 }
 
 function updateFlashlight(flashlight, player, flashlightOn, batteryLevel) {
@@ -65,4 +44,26 @@ function updateFlashlight(flashlight, player, flashlightOn, batteryLevel) {
     }
 
     return { flashlightOn, batteryLevel };
+}
+
+function increaseFlashlightSize(flashlight, amount) {
+    currentFlashlightRadius += amount;
+    flashlight.radius = currentFlashlightRadius;
+    
+    // Update the polygon shape
+    const newPoints = [];
+    for (let i = 0; i < 16; i++) {
+        const angle = (i / 16) * Math.PI * 2;
+        newPoints.push(vec2(
+            Math.cos(angle) * currentFlashlightRadius,
+            Math.sin(angle) * currentFlashlightRadius
+        ));
+    }
+    
+    // Update the flashlight's shape directly
+    flashlight.polygon = newPoints;
+}
+
+function getFlashlightRadius() {
+    return currentFlashlightRadius;
 }

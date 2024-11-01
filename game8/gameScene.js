@@ -201,6 +201,17 @@ function gameScene(gameState) {
             }
         }
 
+        if (level === 1) { 
+            add([
+                text("Press SPACE to use your flashlight!", { size: 24 }),
+                pos(width() / 2, height() - 50),
+                anchor("center"),
+                color(255, 255, 0),
+                lifespan(5)
+            ]);
+            console.log("Tutorial message added");
+        }
+
         updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount);
     });
 }
