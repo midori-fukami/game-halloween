@@ -39,6 +39,12 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
 
     upgrades.forEach((upgrade, index) => {
         add([
+            rect(600, 40), // Width and height of the rectangle
+            pos(20, 100 + index * 30), // Position it below each option
+            color(0, 0, 0, 0.7), // Black with some transparency
+            anchor("topleft"),
+        ]);
+        add([
             text(`${index + 1}. ${upgrade.name} - Cost: ${upgrade.cost}`, 18),
             pos(20, 100 + index * 30),
             color(255, 255, 255),
