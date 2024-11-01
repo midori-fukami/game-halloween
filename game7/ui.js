@@ -45,7 +45,6 @@ function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activ
         }
     }
     ui.powerUpUI.text = activePowerUpsText;
-
     if (hasCrucifix) {
         ui.powerUpUI.text += `Crucifix: ${Math.ceil(crucifixTimer)}s `;
     }

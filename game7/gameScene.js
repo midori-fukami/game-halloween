@@ -25,6 +25,13 @@ function gameScene(gameState) {
     spawnGhost(level, player);
     spawnPowerUp();
 
+    function checkLevelCompletion() {
+        if (score >= TARGET_SCORE) {
+            play("levelComplete", { volume: 0.5 });
+            go("game", { level: level + 1, sanity: sanity });
+        }
+    }
+
     function activateCrucifix() {
         hasCrucifix = true;
         crucifixTimer = CRUCIFIX_DURATION;
@@ -85,10 +92,7 @@ function gameScene(gameState) {
         destroy(c);
         score += 10;
         play("collect");
-        if (score >= TARGET_SCORE) {
-            play("levelComplete", { volume: 0.5 });
-            go("game", { level: level + 1, sanity: sanity });
-        }
+        checkLevelCompletion(); // Check if level is complete after collecting candy
     });
 
     onCollide("player", "ghost", (p, g) => {
@@ -96,17 +100,18 @@ function gameScene(gameState) {
             destroy(g);
             score += EXORCISM_POINTS;
             play("exorcism"); // Add an exorcism sound effect
+            checkLevelCompletion(); // Check if level is complete after exorcism
         } else if (!activePowerUps.invincibility && !g.stunned) {
             sanity -= 10;
             play("jumpscare");
             shake(5);
         }
     });
-
     onCollide("player", "pumpkin", (p, pumpkin) => {
         destroy(pumpkin);
         score += 20;
         play("collect");
+        checkLevelCompletion(); // Check if level is complete after collecting candy
     });
 
     onCollide("player", "powerup", (p, powerup) => {
@@ -163,8 +168,7 @@ function gameScene(gameState) {
         }
 
         timeLeft -= dt();
-        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps);
-
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, crucifixTimer);
         if (timeLeft <= 0 || sanity <= 0) {
             ambientSound.stop();
             go("gameOver", { score, level });
