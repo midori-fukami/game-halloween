@@ -13,6 +13,11 @@ function gameScene(gameState) {
     };
     let hasCrucifix = false;
     let crucifixTimer = 0;
+    const rgbColors = [
+        [255, 0, 0],   // Red
+        [0, 255, 0],   // Green
+        [0, 0, 255]    // Blue
+    ];
 
     const ambientSound = play("ambient", { loop: true, volume: 0.5 });
 
@@ -36,7 +41,6 @@ function gameScene(gameState) {
         hasCrucifix = true;
         crucifixTimer = CRUCIFIX_DURATION;
         // You might want to add a visual indicator that the crucifix is active
-        player.use(color(255, 255, 0)); // Example: turn the player yellow
     }
 
     onCollide("player", "crucifix", (p, c) => {
@@ -168,7 +172,7 @@ function gameScene(gameState) {
         }
 
         timeLeft -= dt();
-        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, crucifixTimer);
+
         if (timeLeft <= 0 || sanity <= 0) {
             ambientSound.stop();
             go("gameOver", { score, level });
@@ -185,7 +189,13 @@ function gameScene(gameState) {
             if (crucifixTimer <= 0) {
                 hasCrucifix = false;
                 player.use(color(255, 255, 255)); // Reset player color
+            } else {
+                // Make the player blink in RGB colors
+                rgbIndex = Math.floor(time() * 10) % rgbColors.length;
+                player.use(color(rgbColors[rgbIndex]));
             }
         }
+
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix);
     });
 }

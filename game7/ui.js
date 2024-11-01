@@ -32,20 +32,21 @@ function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel) {
     return { scoreText, timerText, sanityMeter, batteryUI, powerUpUI };
 }
 
-function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, crucifixTimer) {
+function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix) {
     ui.scoreText.text = `Score: ${score}/${TARGET_SCORE}`;
     ui.timerText.text = `Time: ${Math.ceil(timeLeft)}`;
     ui.sanityMeter.width = (sanity / 100) * 200;
     ui.sanityMeter.color = sanity > 50 ? rgb(0, 255, 0) : rgb(255, 0, 0);
     ui.batteryUI.text = `Battery: ${Math.floor(batteryLevel)}%`;
+
     let activePowerUpsText = "Active Power-ups: ";
     for (const [type, active] of Object.entries(activePowerUps)) {
         if (active) {
             activePowerUpsText += `${type} `;
         }
     }
-    ui.powerUpUI.text = activePowerUpsText;
     if (hasCrucifix) {
-        ui.powerUpUI.text += `Crucifix: ${Math.ceil(crucifixTimer)}s `;
+        activePowerUpsText += "Crucifix ";
     }
+    ui.powerUpUI.text = activePowerUpsText;
 }
