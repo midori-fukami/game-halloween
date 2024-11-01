@@ -40,4 +40,3 @@ function updateFlashlight(flashlight, player, flashlightOn, batteryLevel) {
 
     return { flashlightOn, batteryLevel };
 }
-

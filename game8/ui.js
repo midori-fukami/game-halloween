@@ -29,15 +29,24 @@ function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel) {
         color(255, 255, 255),
     ]);
 
-    return { scoreText, timerText, sanityMeter, batteryUI, powerUpUI };
+    // New: Candy count UI element
+    const candyCountText = add([
+        text("Candies: 0"),
+        pos(20, 170),
+        color(255, 165, 0),
+    ]);
+
+    return { scoreText, timerText, sanityMeter, batteryUI, powerUpUI, candyCountText };
 }
 
-function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix) {
+// Update function to include candy count
+function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount) {
     ui.scoreText.text = `Score: ${score}/${TARGET_SCORE}`;
     ui.timerText.text = `Time: ${Math.ceil(timeLeft)}`;
     ui.sanityMeter.width = (sanity / 100) * 200;
     ui.sanityMeter.color = sanity > 50 ? rgb(0, 255, 0) : rgb(255, 0, 0);
     ui.batteryUI.text = `Battery: ${Math.floor(batteryLevel)}%`;
+    ui.candyCountText.text = `Candies: ${candyCount}`; // Update candy count
 
     let activePowerUpsText = "Active Power-ups: ";
     for (const [type, active] of Object.entries(activePowerUps)) {

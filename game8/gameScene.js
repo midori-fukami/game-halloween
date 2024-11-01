@@ -31,23 +31,23 @@ function gameScene(gameState) {
     spawnGhost(level, player);
     spawnPowerUp();
 
-    // When a player collects a candy
+    // Function to handle candy collection
     function collectCandy() {
         candyCount++;
-        // Update UI or add sound effect for feedback
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount); // Update UI
     }
 
+    // Function to check if the level is complete and transition to upgrade scene
     function checkLevelCompletion() {
         if (score >= TARGET_SCORE) {
             play("levelComplete", { volume: 0.5 });
-            go("game", { level: level + 1, sanity: sanity });
+            go("upgradeScene", { candyCount, level: level + 1, sanity });
         }
     }
 
     function activateCrucifix() {
         hasCrucifix = true;
         crucifixTimer = CRUCIFIX_DURATION;
-        // You might want to add a visual indicator that the crucifix is active
     }
 
     onCollide("player", "crucifix", (p, c) => {
@@ -103,6 +103,7 @@ function gameScene(gameState) {
         destroy(c);
         score += 10;
         play("collect");
+        collectCandy(); // Increment candy count
         checkLevelCompletion(); // Check if level is complete after collecting candy
     });
 
@@ -118,6 +119,7 @@ function gameScene(gameState) {
             shake(5);
         }
     });
+
     onCollide("player", "pumpkin", (p, pumpkin) => {
         destroy(pumpkin);
         score += 20;
