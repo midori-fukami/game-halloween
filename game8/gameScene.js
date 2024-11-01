@@ -1,5 +1,7 @@
+// gameScene.js
+
 function gameScene(gameState) {
-    let { level, sanity } = gameState;
+    let { level, sanity, candyCount = 0, flashlightRadius } = gameState;
     let score = 0;
     let timeLeft = 60;
     const TARGET_SCORE = level * 50;
@@ -18,7 +20,6 @@ function gameScene(gameState) {
         [0, 255, 0],   // Green
         [0, 0, 255]    // Blue
     ];
-    let candyCount = 0; // Track candies collected
 
     const ambientSound = play("ambient", { loop: true, volume: 0.5 });
 
@@ -26,12 +27,14 @@ function gameScene(gameState) {
 
     const player = createPlayer();
     const flashlight = createFlashlight();
+    if (flashlightRadius) {
+        increaseFlashlightSize(flashlight, flashlightRadius - getFlashlightRadius());
+    }
     const ui = createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel, candyCount);
 
     spawnGhost(level, player);
     spawnPowerUp();
 
-    // Function to handle candy collection
     function collectCandy() {
         candyCount++;
         updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount);
@@ -102,16 +105,16 @@ function gameScene(gameState) {
         destroy(c);
         score += 10;
         play("collect");
-        collectCandy(); // Increment candy count
-        checkLevelCompletion(); // Check if level is complete after collecting candy
+        collectCandy();
+        checkLevelCompletion();
     });
 
     onCollide("player", "ghost", (p, g) => {
         if (hasCrucifix) {
             destroy(g);
             score += EXORCISM_POINTS;
-            play("exorcism"); // Add an exorcism sound effect
-            checkLevelCompletion(); // Check if level is complete after exorcism
+            play("exorcism");
+            checkLevelCompletion();
         } else if (!activePowerUps.invincibility && !g.stunned) {
             sanity -= 10;
             play("jumpscare");
@@ -123,7 +126,7 @@ function gameScene(gameState) {
         destroy(pumpkin);
         score += 20;
         play("collect");
-        checkLevelCompletion(); // Check if level is complete after collecting candy
+        checkLevelCompletion();
     });
 
     onCollide("player", "powerup", (p, powerup) => {
@@ -143,7 +146,6 @@ function gameScene(gameState) {
             clearWeather();
         }
 
-        // Update ghosts based on weather and power-ups
         get("ghost").forEach(ghost => {
             if (!ghost.stunned) {
                 ghost.opacity = GHOST_BASE_OPACITY * getVisibilityFactor();
@@ -158,7 +160,6 @@ function gameScene(gameState) {
             }
         });
 
-        // Magnet power-up effect
         if (activePowerUps.magnet) {
             get("candy").forEach(candy => {
                 const dir = player.pos.sub(candy.pos).unit();
@@ -170,7 +171,6 @@ function gameScene(gameState) {
             });
         }
 
-        // Adjust candy and pumpkin spawn rates based on weather difficulty
         const difficultyFactor = getDifficultyFactor();
         if (rand(0, 100) < 2 * difficultyFactor) {
             spawnCandy(level);
@@ -186,19 +186,16 @@ function gameScene(gameState) {
             go("gameOver", { score, level });
         }
 
-        // Spawn crucifix
         if (rand() < CRUCIFIX_SPAWN_CHANCE) {
             spawnCrucifix();
         }
 
-        // Update crucifix timer
         if (hasCrucifix) {
             crucifixTimer -= dt();
             if (crucifixTimer <= 0) {
                 hasCrucifix = false;
-                player.use(color(255, 255, 255)); // Reset player color
+                player.use(color(255, 255, 255));
             } else {
-                // Make the player blink in RGB colors
                 rgbIndex = Math.floor(time() * 10) % rgbColors.length;
                 player.use(color(rgbColors[rgbIndex]));
             }

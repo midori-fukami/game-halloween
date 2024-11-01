@@ -1,7 +1,6 @@
 // upgradeScene.js
 
 function upgradeScene({ candyCount, level, sanity, flashlight }) {
-    // Add the same background as the game scene
     add([sprite("background"), scale(0.7)]);
 
     const candyCountText = add([
@@ -17,7 +16,6 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
         color(255, 255, 255),
     ]);
 
-    // Define upgrade options
     const upgrades = [
         { 
             name: "Speed", 
@@ -32,7 +30,10 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
         { 
             name: "Flashlight Size", 
             cost: UPGRADE_COSTS.flashlight, 
-            upgrade: () => increaseFlashlightSize(10) 
+            upgrade: () => {
+                increaseFlashlightSize(flashlight, 10);
+                return `Flashlight size increased to ${getFlashlightRadius()}`;
+            }
         },
     ];
 
@@ -44,20 +45,18 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
         ]);
     });
 
-    // Define upgrade purchase logic
     function attemptUpgrade(upgrade) {
         if (candyCount >= upgrade.cost) {
             candyCount -= upgrade.cost;
-            upgrade.upgrade();
+            const result = upgrade.upgrade();
             play("powerup");
             add([
-                text("Upgrade successful!", 16),
+                text(result || "Upgrade successful!", 16),
                 pos(width() / 2, height() - 40),
                 color(0, 255, 0),
                 anchor("center"),
                 lifespan(1)
             ]);
-            // Update candy count display
             candyCountText.text = `Candies: ${candyCount}`;
         } else {
             add([
@@ -70,12 +69,10 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
         }
     }
 
-    // Listen for key presses to buy upgrades
     onKeyPress("1", () => attemptUpgrade(upgrades[0]));
     onKeyPress("2", () => attemptUpgrade(upgrades[1]));
     onKeyPress("3", () => attemptUpgrade(upgrades[2]));
 
-    // Proceed to the game scene after upgrading
     add([
         text("Press ENTER to continue", 18),
         pos(width() / 2, height() - 80),
@@ -83,5 +80,5 @@ function upgradeScene({ candyCount, level, sanity, flashlight }) {
         color(255, 255, 255),
     ]);
 
-    onKeyPress("enter", () => go("game", { level, sanity, candyCount, flashlight }));
+    onKeyPress("enter", () => go("game", { level, sanity, candyCount, flashlightRadius: getFlashlightRadius() }));
 }
