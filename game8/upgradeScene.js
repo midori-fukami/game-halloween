@@ -1,18 +1,20 @@
 // upgradeScene.js
 
 function upgradeScene({ candyCount, level, sanity }) {
+    // Add the same background as the game scene
+    add([sprite("background"), scale(0.7)]);
+
+    const candyCountText = add([
+        text(`Candies: ${candyCount}`, 18),
+        pos(20, 60),
+        color(255, 255, 0),
+    ]);
+
     add([
         text("Upgrade Menu", 24),
         pos(width() / 2, 20),
         anchor("center"),
         color(255, 255, 255),
-    ]);
-
-    // Display candy count
-    add([
-        text(`Candies: ${candyCount}`, 18),
-        pos(20, 60),
-        color(255, 255, 0),
     ]);
 
     // Define upgrade options
@@ -55,6 +57,8 @@ function upgradeScene({ candyCount, level, sanity }) {
                 anchor("center"),
                 lifespan(1)
             ]);
+            // Update candy count display
+            candyCountText.text = `Candies: ${candyCount}`;
         } else {
             add([
                 text("Not enough candies!", 16),

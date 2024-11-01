@@ -1,4 +1,4 @@
-function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel) {
+function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel, candyCount) {
     const scoreText = add([
         text(`Score: ${score}/${TARGET_SCORE}`),
         pos(20, 20),
@@ -31,7 +31,7 @@ function createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel) {
 
     // New: Candy count UI element
     const candyCountText = add([
-        text("Candies: 0"),
+        text(`Candies: ${candyCount}`),
         pos(20, 170),
         color(255, 165, 0),
     ]);
@@ -46,7 +46,7 @@ function updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activ
     ui.sanityMeter.width = (sanity / 100) * 200;
     ui.sanityMeter.color = sanity > 50 ? rgb(0, 255, 0) : rgb(255, 0, 0);
     ui.batteryUI.text = `Battery: ${Math.floor(batteryLevel)}%`;
-    ui.candyCountText.text = `Candies: ${candyCount}`; // Update candy count
+    ui.candyCountText.text = `Candies: ${candyCount}`;
 
     let activePowerUpsText = "Active Power-ups: ";
     for (const [type, active] of Object.entries(activePowerUps)) {

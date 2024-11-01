@@ -26,7 +26,7 @@ function gameScene(gameState) {
 
     const player = createPlayer();
     const flashlight = createFlashlight();
-    const ui = createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel);
+    const ui = createUI(score, TARGET_SCORE, timeLeft, sanity, batteryLevel, candyCount);
 
     spawnGhost(level, player);
     spawnPowerUp();
@@ -34,7 +34,7 @@ function gameScene(gameState) {
     // Function to handle candy collection
     function collectCandy() {
         candyCount++;
-        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount); // Update UI
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount);
     }
 
     // Function to check if the level is complete and transition to upgrade scene

@@ -1,5 +1,6 @@
 function loadAssets() {
-    loadSprite("player", "/sprite/playerleft.png");
+    loadSprite("playerLeft", "/sprite/playerleft.png");
+    loadSprite("playerRight", "/sprite/playerright.png");
     loadSprite("candy", "/sprite/candy.png");
     loadSprite("ghost", "/sprite/Ghost2.png");
     loadSprite("pumpkin", "/sprite/Pumpkin1.png");

@@ -19,6 +19,6 @@ function menuScene() {
     ]);
 
     onKeyPress("space", () => {
-        go("game", { level: 1, sanity: 100 });
+        go("game", { level: 1, sanity: 100, candyCount: 0 });
     });
 }
