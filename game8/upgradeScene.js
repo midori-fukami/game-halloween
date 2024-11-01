@@ -1,6 +1,6 @@
 // upgradeScene.js
 
-function upgradeScene({ candyCount, level, sanity }) {
+function upgradeScene({ candyCount, level, sanity, flashlight }) {
     // Add the same background as the game scene
     add([sprite("background"), scale(0.7)]);
 
@@ -19,9 +19,21 @@ function upgradeScene({ candyCount, level, sanity }) {
 
     // Define upgrade options
     const upgrades = [
-        { name: "Speed", cost: UPGRADE_COSTS.speed, upgrade: () => increasePlayerSpeed(20) },
-        { name: "Power Duration", cost: UPGRADE_COSTS.powerDuration, upgrade: () => increasePowerupDuration(2) },
-        { name: "Flashlight Size", cost: UPGRADE_COSTS.flashlight, upgrade: () => increaseFlashlightRadius(20) },
+        { 
+            name: "Speed", 
+            cost: UPGRADE_COSTS.speed, 
+            upgrade: () => increasePlayerSpeed(20) 
+        },
+        { 
+            name: "Power Duration", 
+            cost: UPGRADE_COSTS.powerDuration, 
+            upgrade: () => increasePowerupDuration(2) 
+        },
+        { 
+            name: "Flashlight Size", 
+            cost: UPGRADE_COSTS.flashlight, 
+            upgrade: () => increaseFlashlightSize(10) 
+        },
     ];
 
     upgrades.forEach((upgrade, index) => {
@@ -31,18 +43,6 @@ function upgradeScene({ candyCount, level, sanity }) {
             color(255, 255, 255),
         ]);
     });
-
-    function increasePlayerSpeed(amount) {
-        PLAYER_SPEED += amount;
-    }
-    
-    function increasePowerupDuration(amount) {
-        POWERUP_DURATION += amount;
-    }
-    
-    function increaseFlashlightRadius(amount) {
-        FLASHLIGHT_RADIUS += amount;
-    }
 
     // Define upgrade purchase logic
     function attemptUpgrade(upgrade) {
@@ -83,5 +83,5 @@ function upgradeScene({ candyCount, level, sanity }) {
         color(255, 255, 255),
     ]);
 
-    onKeyPress("enter", () => go("game", { level, sanity, candyCount }));
+    onKeyPress("enter", () => go("game", { level, sanity, candyCount, flashlight }));
 }

@@ -37,11 +37,10 @@ function gameScene(gameState) {
         updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount);
     }
 
-    // Function to check if the level is complete and transition to upgrade scene
     function checkLevelCompletion() {
         if (score >= TARGET_SCORE) {
             play("levelComplete", { volume: 0.5 });
-            go("upgradeScene", { candyCount, level: level + 1, sanity });
+            go("upgradeScene", { candyCount, level: level + 1, sanity, flashlight });
         }
     }
 
@@ -205,6 +204,6 @@ function gameScene(gameState) {
             }
         }
 
-        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix);
+        updateUI(ui, score, TARGET_SCORE, timeLeft, sanity, batteryLevel, activePowerUps, hasCrucifix, candyCount);
     });
 }
